@@ -33,9 +33,23 @@ Use the installer to vendor this bundle into a project or install it globally fo
 ./scripts/install_skill.sh --mode global --agent openclaw
 ```
 
+Pass `--dry-run` to preview what would be written before committing:
+
+```sh
+./scripts/install_skill.sh --mode project --agent all --dry-run
+```
+
+To remove a previously installed bundle and its managed instruction blocks:
+
+```sh
+./scripts/install_skill.sh --mode project --agent all --uninstall
+./scripts/install_skill.sh --mode global --agent claude --uninstall
+```
+
 Project mode:
 
 - copies the bundle into `.agent-skills/socket-dependency-guard` for Codex, Claude, and Antigravity
+  - Note: `--agent claude` uses the same `.agent-skills/` path as other non-OpenClaw agents
 - copies the bundle into `skills/socket-dependency-guard` for OpenClaw
 - updates project-root `AGENTS.md` for Codex-style and Antigravity-style project instructions
 - updates project-root `CLAUDE.md` with an import for Claude Code
@@ -100,11 +114,13 @@ Before changing manifests or lockfiles, the agent must report:
 
 ## Local Setup
 
-Install the Socket CLI:
+Install the Socket CLI (npm package, used for local review commands):
 
 ```sh
 npm install -g socket
 ```
+
+> **Note on tooling:** There are two distinct Socket tools. The `socket` npm package (installed above) is used for local CLI review via `socket package shallow|deep`. The `socketsecurity` Python package is a separate CI wrapper used by the included GitHub Actions example via `socket ci`. They serve different purposes — you do not need the Python package for local development.
 
 Credential options for the CLI fallback:
 
@@ -160,7 +176,7 @@ To use it in another repository, copy it into `.github/workflows/socket-dependen
 The example workflow:
 
 - runs on pushes and pull requests
-- installs the Socket CLI
+- installs the Socket Python CI wrapper (`socketsecurity`)
 - runs `socket ci`
 - fails when the scan violates policy
 
