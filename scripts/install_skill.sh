@@ -9,7 +9,7 @@ repo_root="$(cd "$script_dir/.." && pwd)"
 usage() {
   cat <<EOF
 Usage:
-  install_skill.sh --mode project|global --agent codex|claude|antigravity|all [--target <path>]
+  install_skill.sh --mode project|global --agent codex|claude|antigravity|openclaw|all [--target <path>]
 
 Examples:
   ./scripts/install_skill.sh --mode project --agent all
@@ -17,6 +17,7 @@ Examples:
   ./scripts/install_skill.sh --mode global --agent codex
   ./scripts/install_skill.sh --mode global --agent claude
   ./scripts/install_skill.sh --mode global --agent antigravity
+  ./scripts/install_skill.sh --mode global --agent openclaw
 
 Behavior:
   - project mode vendors this bundle into <target>/.agent-skills/${skill_name}
@@ -25,6 +26,7 @@ Behavior:
     and adds an import block to ~/.claude/CLAUDE.md
   - global antigravity mode installs the bundle into ~/.gemini/skills/${skill_name}
     and adds a managed guidance block to ~/.gemini/GEMINI.md
+  - global openclaw mode installs the bundle into ~/.openclaw/skills/${skill_name}
 EOF
 }
 
@@ -69,7 +71,7 @@ if [[ "$mode" != "project" && "$mode" != "global" ]]; then
 fi
 
 case "$agent" in
-  codex|claude|antigravity|all) ;;
+  codex|claude|antigravity|openclaw|all) ;;
   *)
     echo "Invalid agent: $agent" >&2
     exit 64
@@ -174,10 +176,21 @@ EOF
 
 install_project() {
   local project_root="${target:-$PWD}"
-  local bundle_dir="$project_root/.agent-skills/${skill_name}"
+  local codex_bundle_dir="$project_root/.agent-skills/${skill_name}"
+  local openclaw_bundle_dir="$project_root/skills/${skill_name}"
+  local installed_bundles=()
 
-  mkdir -p "$project_root/.agent-skills"
-  copy_bundle "$bundle_dir"
+  if [[ "$agent" == "codex" || "$agent" == "antigravity" || "$agent" == "claude" || "$agent" == "all" ]]; then
+    mkdir -p "$project_root/.agent-skills"
+    copy_bundle "$codex_bundle_dir"
+    installed_bundles+=("$codex_bundle_dir")
+  fi
+
+  if [[ "$agent" == "openclaw" || "$agent" == "all" ]]; then
+    mkdir -p "$project_root/skills"
+    copy_bundle "$openclaw_bundle_dir"
+    installed_bundles+=("$openclaw_bundle_dir")
+  fi
 
   if [[ "$agent" == "codex" || "$agent" == "antigravity" || "$agent" == "all" ]]; then
     upsert_block "$project_root/AGENTS.md" "$(project_agents_block)"
@@ -192,7 +205,7 @@ status=installed
 mode=project
 agent=$agent
 project_root=$project_root
-bundle=$bundle_dir
+bundles=${installed_bundles[*]}
 EOF
 }
 
@@ -243,6 +256,20 @@ memory=$memory_file
 EOF
 }
 
+install_global_openclaw() {
+  local dest="$HOME/.openclaw/skills/${skill_name}"
+
+  mkdir -p "$HOME/.openclaw/skills"
+  copy_bundle "$dest"
+
+  cat <<EOF
+status=installed
+mode=global
+agent=openclaw
+bundle=$dest
+EOF
+}
+
 if [[ "$mode" == "project" ]]; then
   install_project
   exit 0
@@ -258,9 +285,13 @@ case "$agent" in
   antigravity)
     install_global_antigravity
     ;;
+  openclaw)
+    install_global_openclaw
+    ;;
   all)
     install_global_codex
     install_global_claude
     install_global_antigravity
+    install_global_openclaw
     ;;
 esac

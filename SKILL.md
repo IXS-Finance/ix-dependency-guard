@@ -1,6 +1,9 @@
 ---
 name: "socket-dependency-guard"
 description: "Use when a task adds, upgrades, removes, or reviews software dependencies and the agent should apply a Socket-based supply-chain guardrail before changing manifests or lockfiles. Prefer MCP `depscore` when available, otherwise use the bundled Socket CLI helper. Stop and recommend an alternative or human review when risk signals are weak."
+metadata:
+  openclaw:
+    emoji: "🛡️"
 ---
 
 # Socket Dependency Guard
@@ -38,5 +41,6 @@ Use the short response template in `references/examples.md` when presenting the 
 ## Notes
 
 - Keep `SKILL.md` lean; do not duplicate the full policy here.
+- OpenClaw metadata is intentionally minimal so the skill stays eligible even when the Socket CLI is not installed and MCP `depscore` is the available review path.
 - If Socket tooling is unavailable, require human review before adding the dependency.
 - Review manifest and lockfile changes together.

@@ -5,6 +5,7 @@ Portable dependency-review guardrail for agentic coding workflows.
 This repository now packages the same policy in multiple forms:
 
 - `SKILL.md`: native Codex skill entrypoint
+- `SKILL.md` with OpenClaw metadata: OpenClaw workspace/global skill entrypoint
 - `agents/openai.yaml`: Codex UI metadata
 - `AGENTS.md`: project instructions for agents that auto-load `AGENTS.md`
 - `CLAUDE.md`: Claude Code project memory
@@ -15,6 +16,7 @@ This repository now packages the same policy in multiple forms:
 ## Supported Agent Shapes
 
 - Codex app: native skill via `SKILL.md`
+- OpenClaw: native skill via `SKILL.md` in a `skills/` directory
 - Codex CLI: project instructions via `AGENTS.md`
 - Claude Code: project memory via `CLAUDE.md`
 - Other `AGENTS.md`-aware agents: use `AGENTS.md`
@@ -28,11 +30,13 @@ Use the installer to vendor this bundle into a project or install it globally fo
 ./scripts/install_skill.sh --mode global --agent codex
 ./scripts/install_skill.sh --mode global --agent claude
 ./scripts/install_skill.sh --mode global --agent antigravity
+./scripts/install_skill.sh --mode global --agent openclaw
 ```
 
 Project mode:
 
-- copies the bundle into `.agent-skills/socket-dependency-guard`
+- copies the bundle into `.agent-skills/socket-dependency-guard` for Codex, Claude, and Antigravity
+- copies the bundle into `skills/socket-dependency-guard` for OpenClaw
 - updates project-root `AGENTS.md` for Codex-style and Antigravity-style project instructions
 - updates project-root `CLAUDE.md` with an import for Claude Code
 
@@ -41,10 +45,11 @@ Global mode:
 - Codex: installs into `$CODEX_HOME/skills/socket-dependency-guard` or `~/.codex/skills/socket-dependency-guard`
 - Claude Code: installs into `~/.claude/skills/socket-dependency-guard` and updates `~/.claude/CLAUDE.md`
 - Antigravity: installs into `~/.gemini/skills/socket-dependency-guard` and updates `~/.gemini/GEMINI.md`
+- OpenClaw: installs into `~/.openclaw/skills/socket-dependency-guard`
 
 ## How It Works
 
-This bundle is designed so an agent can apply the same dependency-review policy regardless of whether it is running as a native Codex skill, an `AGENTS.md`-driven project instruction, or a Claude memory import.
+This bundle is designed so an agent can apply the same dependency-review policy regardless of whether it is running as a native skill, an `AGENTS.md`-driven project instruction, or a Claude memory import.
 
 ```mermaid
 flowchart TD
@@ -76,11 +81,17 @@ Before changing manifests or lockfiles, the agent must report:
 
 ### Why There Are Multiple Files
 
-- `SKILL.md` is the native Codex skill entrypoint.
+- `SKILL.md` is the native skill entrypoint for Codex and OpenClaw.
 - `AGENTS.md` is for tools that auto-load project instructions from that filename.
 - `CLAUDE.md` is the Claude Code memory adapter.
 - `references/` holds the canonical policy so the adapters stay short and consistent.
 - `scripts/check_dependency.sh` gives non-MCP environments a repeatable fallback path.
+
+### OpenClaw Notes
+
+- OpenClaw loads workspace skills from `<workspace>/skills`.
+- This repo keeps OpenClaw metadata in `SKILL.md` only; it does not require a separate memory import file.
+- The skill does not declare a required `socket` binary for OpenClaw because MCP `depscore` is the preferred path and should not be blocked by missing CLI tooling.
 
 ### Install Models
 
