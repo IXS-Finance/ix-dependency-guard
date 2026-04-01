@@ -42,5 +42,7 @@ Use the short response template in `references/examples.md` when presenting the 
 
 - Keep `SKILL.md` lean; do not duplicate the full policy here.
 - OpenClaw metadata is intentionally minimal so the skill stays eligible even when the Socket CLI is not installed and MCP `depscore` is the available review path.
+- For CLI fallback auth, allow either a user-supplied private token or a limited public-login flow if the installed Socket CLI supports blank-submit login.
+- Do not assume system-wide wrapper enforcement or shell-completion setup is desirable; keep CLI setup minimal.
 - If Socket tooling is unavailable, require human review before adding the dependency.
 - Review manifest and lockfile changes together.

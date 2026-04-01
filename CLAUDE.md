@@ -15,4 +15,6 @@ Required process:
    - whether install scripts, risky capabilities, or transitive risk are present
 6. If the result is `allow_with_warning`, `block_pending_human_review`, or `block`, stop and explain the safer path.
 
+For CLI fallback auth, use either a user-supplied private Socket token or a limited public-login flow if the installed Socket CLI supports blank-submit login. Do not assume system-wide wrapper enforcement or shell completion.
+
 For fuller packaging metadata, see `SKILL.md`.

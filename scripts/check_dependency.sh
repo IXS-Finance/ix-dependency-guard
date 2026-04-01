@@ -14,6 +14,12 @@ Examples:
 
 This helper produces a Socket CLI markdown report artifact for agent review.
 Interpret the result with references/decision-matrix.md.
+
+Authentication:
+  - Preferred: Socket MCP `depscore`
+  - CLI fallback: `socket login`
+  - If your installed CLI supports it, submitting a blank token may enable limited public access
+  - Users with a private Socket token can also set SOCKET_SECURITY_API_TOKEN
 EOF
 }
 
@@ -85,7 +91,7 @@ mkdir -p "$(dirname "$output")"
 
 if ! socket package "$mode" "$ecosystem" "$target" --markdown >"$output"; then
   rm -f "$output"
-  echo "Socket package lookup failed. Authenticate with \`socket login\` or set SOCKET_SECURITY_API_TOKEN." >&2
+  echo "Socket package lookup failed. Authenticate with \`socket login\` or set SOCKET_SECURITY_API_TOKEN. If your Socket CLI supports blank-submit login, that may enable limited public access." >&2
   exit 70
 fi
 
