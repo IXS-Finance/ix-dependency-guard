@@ -1,0 +1,5 @@
+# Generated Socket review reports from check_dependency.sh
+tmp/socket-reports/
+
+# General temp dir
+tmp/

@@ -1,0 +1,26 @@
+name: pr-tests
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+jobs:
+  smoke-tests:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run installer smoke suite
+        run: bash tests/install_skill_smoke.sh
+
+      - name: Run OpenClaw smoke test
+        run: bash tests/install_skill_openclaw_smoke.sh
