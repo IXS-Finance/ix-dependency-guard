@@ -1,0 +1,7 @@
+interface:
+  display_name: "Socket Dependency Guard"
+  short_description: "Gate dependency changes with Socket checks"
+  default_prompt: "Use $socket-dependency-guard to review a proposed dependency before changing manifests or lockfiles."
+
+policy:
+  allow_implicit_invocation: true
