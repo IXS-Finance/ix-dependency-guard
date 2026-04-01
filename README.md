@@ -1,4 +1,4 @@
-# Socket Dependency Guard
+# IX Dependency Guard
 
 Portable dependency-review guardrail for agentic coding workflows.
 
