@@ -106,19 +106,39 @@ Install the Socket CLI:
 npm install -g socket
 ```
 
-Optional wrapper protection:
+Credential options for the CLI fallback:
 
 ```sh
-socket wrapper on
+socket login
 ```
 
-Protected package-manager examples:
+Recommended interactive setup:
+
+1. Run `socket login`.
+2. If your CLI offers a blank-token path, press Enter at the token prompt to use the limited public token.
+3. Decline system-wide enforcement when prompted.
+4. Decline bash completion when prompted.
+5. If you already have a private Socket API token, paste that instead of using the limited public token.
+
+Environment-variable alternative for private credentials:
 
 ```sh
-socket npm install <package>
-socket npm uninstall <package>
-socket npx <tool>
-sfw npm ci
+export SOCKET_SECURITY_API_TOKEN="your-private-token"
+```
+
+Notes:
+
+- Prefer MCP `depscore` when available; Socket's hosted MCP path can work without local CLI credentials.
+- The blank-submit `socket login` flow is a CLI behavior that may provide limited public access, but Socket's public docs do not currently publish a quota number for that mode.
+- The official Socket API rate limit documented for authenticated API usage is `600 requests per minute`.
+- Authenticated tokens can query remaining quota with `GET /v0/quota`; the endpoint itself consumes `0` quota units.
+- Do not enable `socket wrapper on` or shell completion by default in this bundle. Keep the CLI fallback opt-in and local to the user.
+
+CLI review examples:
+
+```sh
+socket package shallow npm zod
+socket package deep npm zod --markdown
 ```
 
 ## Manual Review Helper
