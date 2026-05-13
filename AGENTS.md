@@ -10,6 +10,7 @@ When a task adds, upgrades, removes, or evaluates a dependency:
 4. Apply `references/decision-matrix.md` before touching the manifest or lockfile.
 5. Report the rationale, Socket result, transitive risk, and any install-script or capability concerns before making the change.
 6. If the result is not clearly safe, stop and ask for human review or propose an alternative.
+7. If Socket Firewall (`sfw`) is available locally or in CI, run install commands through it (e.g. `sfw npm install`). This is install-time enforcement and complements — does not replace — the review above.
 
 CLI fallback auth can use either a user-supplied private Socket token or a limited public-login flow if the installed Socket CLI supports blank-submit login. Do not assume system-wide wrapper enforcement or shell-completion setup.
 

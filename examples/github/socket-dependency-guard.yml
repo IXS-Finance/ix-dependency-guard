@@ -42,11 +42,23 @@ jobs:
           GH_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: socket ci
 
-      # Optional: add Firewall-based install protection in CI for package fetches.
-      # - name: Add Socket Firewall
-      #   uses: socketdev/action@v1
-      #   with:
-      #     mode: firewall
-      #
-      # - name: Protected npm install
-      #   run: sfw npm ci
+      # Optional: install-time enforcement via Socket Firewall (free tier).
+      # Blocks fetches of confirmed-malicious packages including transitive ones.
+      # No API key required for firewall-free mode.
+      # Remove this block, or switch mode to `firewall-enterprise` (with `socket-token`),
+      # if you do not want install-time enforcement.
+      - name: Install Socket Firewall
+        uses: SocketDev/action@v1.3.1
+        with:
+          mode: firewall-free
+
+      # Replace the install command for your ecosystem, e.g.:
+      #   sfw npm ci
+      #   sfw pnpm install --frozen-lockfile
+      #   sfw yarn install --immutable
+      #   sfw pip install -r requirements.txt
+      #   sfw uv sync
+      #   sfw cargo fetch
+      - name: Protected install (example)
+        if: false
+        run: sfw npm ci

@@ -120,7 +120,12 @@ Install the Socket CLI (npm package, used for local review commands):
 npm install -g socket
 ```
 
-> **Note on tooling:** There are two distinct Socket tools. The `socket` npm package (installed above) is used for local CLI review via `socket package shallow|deep`. The `socketsecurity` Python package is a separate CI wrapper used by the included GitHub Actions example via `socket ci`. They serve different purposes — you do not need the Python package for local development.
+> **Note on tooling:** There are three distinct Socket tools used by this bundle.
+> - `socket` (npm) — local CLI review via `socket package shallow|deep`. Used pre-change.
+> - `socketsecurity` (Python) — CI wrapper invoked by `socket ci` in the GitHub Actions example.
+> - `sfw` (npm) — Socket Firewall, an install-time proxy that blocks fetches of confirmed-malicious packages. Optional but recommended; see below.
+>
+> They serve different purposes and complement each other. Review tools answer "should we add this?" before the manifest changes; Firewall is a safety net that catches anything reaching `install` time, including transitive pulls and manual edits.
 
 Credential options for the CLI fallback:
 
@@ -157,6 +162,36 @@ socket package shallow npm zod
 socket package deep npm zod --markdown
 ```
 
+## Optional: Socket Firewall (install-time enforcement)
+
+Socket Firewall (`sfw`) is a per-invocation proxy that intercepts package-manager fetches and blocks confirmed-malicious packages, including transitive dependencies. It complements the review-time guardrail in this bundle — review tooling decides whether to add a package; Firewall is a safety net at `install` time.
+
+Install (free tier, no API key, no configuration):
+
+```sh
+npm install -g sfw
+```
+
+Use by prefixing your package-manager command:
+
+```sh
+sfw npm install
+sfw pnpm install --frozen-lockfile
+sfw yarn install --immutable
+sfw pip install -r requirements.txt
+sfw uv sync
+sfw cargo fetch
+```
+
+Notes and caveats:
+
+- Free tier supports npm, yarn, pnpm, pip, uv, and cargo against public registries only.
+- Free tier blocks only confirmed malware; AI-flagged threats warn but do not block. The review-time layer in this bundle is still required.
+- Free tier sends anonymous telemetry (machine identifier, blocked/permitted package metadata, latency, errors, and GitHub org name when present). It does not transmit source code or repo names.
+- License is PolyForm Shield 1.0 (source-available, non-compete). Fine for internal use; not for redistribution.
+- Enterprise tier adds private registries, more ecosystems (Go, Maven, Gradle, gem, Bundler, NuGet), and allow-listing — and requires `SOCKET_SECURITY_API_KEY`.
+- Do not enable `socket wrapper on` system-wide; keep Firewall opt-in and per-command.
+
 ## Manual Review Helper
 
 Generate a review artifact before changing dependencies:
@@ -176,13 +211,14 @@ To use it in another repository, copy it into `.github/workflows/socket-dependen
 The example workflow:
 
 - runs on pushes and pull requests
-- installs the Socket Python CI wrapper (`socketsecurity`)
-- runs `socket ci`
-- fails when the scan violates policy
+- installs the Socket Python CI wrapper (`socketsecurity`) and runs `socket ci` (review-time scan)
+- installs Socket Firewall in `firewall-free` mode via `SocketDev/action@v1.3.1`
+- includes a disabled `sfw npm ci` step you can re-enable and adapt for your ecosystem (the `if: false` guard prevents accidental runs in repos that do not need it)
+- fails when the scan violates policy or when Firewall blocks a malicious fetch
 
 Required secret:
 
-- `SOCKET_SECURITY_API_KEY`
+- `SOCKET_SECURITY_API_KEY` for `socket ci` (review). Firewall-free mode does not require an API key. Use `firewall-enterprise` with `socket-token` if you need allow-lists, private registries, or extended ecosystem coverage.
 
 ## References
 
