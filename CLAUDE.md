@@ -14,6 +14,7 @@ Required process:
    - what Socket reported
    - whether install scripts, risky capabilities, or transitive risk are present
 6. If the result is `allow_with_warning`, `block_pending_human_review`, or `block`, stop and explain the safer path.
+7. If Socket Firewall (`sfw`) is available, run install commands through it (e.g. `sfw npm install`). It is install-time enforcement for confirmed-malicious fetches and does not replace the review steps above. Do not install it implicitly.
 
 For CLI fallback auth, use either a user-supplied private Socket token or a limited public-login flow if the installed Socket CLI supports blank-submit login. Do not assume system-wide wrapper enforcement or shell completion.
 

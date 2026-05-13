@@ -27,6 +27,7 @@ Use this skill when dependency changes are in scope for `npm`, `pnpm`, `yarn`, P
    - a safer dependency
    - a no-dependency implementation
    - explicit human review
+9. When the install command is run by the agent and Socket Firewall (`sfw`) is available, prefix it (e.g. `sfw npm install`). Firewall is an install-time safety net for confirmed-malicious fetches and does not replace the review above.
 
 ## Reporting Contract
 
@@ -44,5 +45,6 @@ Use the short response template in `references/examples.md` when presenting the 
 - OpenClaw metadata is intentionally minimal so the skill stays eligible even when the Socket CLI is not installed and MCP `depscore` is the available review path.
 - For CLI fallback auth, allow either a user-supplied private token or a limited public-login flow if the installed Socket CLI supports blank-submit login.
 - Do not assume system-wide wrapper enforcement or shell-completion setup is desirable; keep CLI setup minimal.
+- Socket Firewall (`sfw`) is optional and per-invocation. Detect availability with `command -v sfw`; do not install it implicitly and do not enable `socket wrapper on`.
 - If Socket tooling is unavailable, require human review before adding the dependency.
 - Review manifest and lockfile changes together.

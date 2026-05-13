@@ -23,12 +23,19 @@ Apply this policy whenever an agent proposes or performs any of the following:
 3. Review manifest and lockfile changes together.
 4. Treat install scripts, obfuscation, privileged capabilities, typosquatting indicators, and unusual maintainer patterns as escalation triggers.
 5. If the dependency cannot be reviewed because tooling is unavailable, require human review before proceeding.
+6. When Socket Firewall (`sfw`) is available, run install commands through it (e.g. `sfw npm install`). This is install-time enforcement only; it does not replace the review step.
 
 ## Preferred Tooling Order
 
+Review-time (decision):
+
 1. MCP `depscore`
-2. Socket CLI package inspection
+2. Socket CLI package inspection (`socket package shallow|deep`)
 3. Human review when neither is available
+
+Install-time (enforcement, complementary):
+
+- Socket Firewall (`sfw`) when available; prefix the install command. Not a substitute for the review step.
 
 ## Required Pre-Change Summary
 
